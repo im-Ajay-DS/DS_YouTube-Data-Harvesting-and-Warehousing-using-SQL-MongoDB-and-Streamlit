@@ -149,7 +149,7 @@ def get_comment_info(video_ids):
         return Comment_Information
         
 #MongoDB Connection
-client = pymongo.MongoClient('mongodb+srv://ajaykumar:varman8448@cluster0.bs1zewt.mongodb.net/?retryWrites=true&w=majority')
+client = pymongo.MongoClient('mongodb+srv://ajay:varman8448@mine.oqu3i5e.mongodb.net/?retryWrites=true&w=majority&appName=mine')
 db = client["youtube"]
 
 # upload to MongoDB
@@ -192,7 +192,7 @@ def channels_table():
         cursor.execute(create_query)
         mydb.commit()
     except:
-        st.write("Channels Table alredy created")    
+        st.write("Channels Table alredy exist")    
 
 
     ch_list = []
@@ -401,7 +401,7 @@ def comments_table():
         mydb.commit()
         
     except:
-        st.write("Commentsp Table already created")
+        st.write("Comments Table already created")
 
     com_list = []
     db = client["youtube"]
@@ -482,44 +482,47 @@ def show_comments_table():
     return comments_table
 
 with st.sidebar:
-    st.title(":green[YOUTUBE DATA HARVESTING AND WAREHOUSING]")
-    st.header("process of the project")
-    st.caption('collecting the datas from API')
-    st.caption("migrating the collected data to mongo db")
-    st.caption("transvering the data to sql")
-    st.caption("retriving the datas from sql")
-    st.caption("finding the answerse for 10 queries from sql")
-    
-channel_id = st.text_input(":red[Enter the Channel id]")
-channels = channel_id.split(',')
+    st.title(":red[YOUTUBE DATA HARVESTING AND WAREHOUSING]")
+    st.header("Project Workflow")
+    st.caption("1. Data Collection: Obtaining data from the YouTube API.")
+    st.caption("2. Data Migration: Storing collected data in MongoDB.")
+    st.caption("3. Data Transformation: Transferring data to SQL.")
+    st.caption("4. Data Retrieval: Extracting information from SQL.")
+    st.caption("5. Query Analysis: Analyzing data to answer 10 specific queries.")
+
+channel_ids_input = st.text_input("Enter Channel ID:")
+channels = channel_ids_input.split('\n')
 channels = [ch.strip() for ch in channels if ch]
 
-if st.button("Collect and Store data"):
+
+if st.button("📥 Collect and Store Data"):
     for channel in channels:
         ch_ids = []
         db = client["youtube"]
         coll1 = db["channel_datas"]
-        for ch_data in coll1.find({},{"_id":0,"channel_information":1}):
+        for ch_data in coll1.find({}, {"_id": 0, "channel_information": 1}):
             ch_ids.append(ch_data["channel_information"]["Channel_Id"])
         if channel in ch_ids:
-            st.success("Channel details of the given channel id: " + channel + " already exists")
+            st.success(f"Channel details for the given channel ID {channel} already exist.")
         else:
             output = channel_details(channel)
             st.success(output)
-            
-if st.button("Migrate to SQL"):
+
+if st.button("🔄 Migrate to SQL"):
     display = tables()
     st.success(display)
-    
-show_table = st.radio(":red[SELECT THE TABLE FOR VIEW]",(":green[channels]",":orange[playlists]",":red[videos]",":blue[comments]"))
 
-if show_table == ":green[channels]":
+st.subheader("🔍 Select Table to View:")
+table_options = ("🟢 Channels", "🟠 Playlists", "🔴 Videos", "🔵 Comments")
+show_table = st.radio(" ", table_options)
+
+if show_table == "🟢 Channels":
     show_channels_table()
-elif show_table == ":orange[playlists]":
+elif show_table == "🟠 Playlists":
     show_playlists_table()
-elif show_table ==":red[videos]":
+elif show_table == "🔴 Videos":
     show_videos_table()
-elif show_table == ":blue[comments]":
+elif show_table == "🔵 Comments":
     show_comments_table()
 
 #SQL connection
@@ -532,7 +535,7 @@ mydb = psycopg2.connect(host="localhost",
 cursor = mydb.cursor()
     
 question = st.selectbox(
-    'Please Select Your Question',
+    'Please Select Your querys',
     ('1. All the videos and the Channel Name',
      '2. Channels with most number of videos',
      '3. 10 most viewed videos',
